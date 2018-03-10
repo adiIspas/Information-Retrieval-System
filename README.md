@@ -4,7 +4,7 @@
 
 | Service   | Release | Develop |
 |:-----------:|:--------:|:---------:|
-|Travis CI|[![Build Status](https://travis-ci.org/adiIspas/Information-Retrieval-System.svg?branch=production)](https://travis-ci.org/adiIspas/Information-Retrieval-System))|[![Build Status](https://travis-ci.org/adiIspas/Information-Retrieval-System.svg?branch=develop)](https://travis-ci.org/adiIspas/Information-Retrieval-System)|
+|Travis CI|[![Build Status](https://travis-ci.org/adiIspas/Information-Retrieval-System.svg?branch=production)](https://travis-ci.org/adiIspas/Information-Retrieval-System)|[![Build Status](https://travis-ci.org/adiIspas/Information-Retrieval-System.svg?branch=develop)](https://travis-ci.org/adiIspas/Information-Retrieval-System)|
 
 ## Short description
 A basic Information retrieval system for Romanian language.
@@ -12,6 +12,7 @@ A basic Information retrieval system for Romanian language.
 
 ## Instruction to use
 ### Requirements
+ - Maven
  - Java 8+
 
 ### Run
