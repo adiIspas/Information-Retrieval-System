@@ -1,8 +1,8 @@
 # Information-Retrieval-System
 
-## Build status
+## Server build status
 
-| Service   | Release | Develop |
+| Service   | Production | Develop |
 |:-----------:|:--------:|:---------:|
 |Travis CI|[![Build Status](https://travis-ci.org/adiIspas/Information-Retrieval-System.svg?branch=production)](https://travis-ci.org/adiIspas/Information-Retrieval-System)|[![Build Status](https://travis-ci.org/adiIspas/Information-Retrieval-System.svg?branch=develop)](https://travis-ci.org/adiIspas/Information-Retrieval-System)|
 
