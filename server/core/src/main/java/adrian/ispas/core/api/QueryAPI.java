@@ -11,6 +11,6 @@ public class QueryAPI {
 
     @RequestMapping("/")
     public String hello() {
-        return "Hello World!";
+        return "Hello World from Spring Boot!";
     }
 }
