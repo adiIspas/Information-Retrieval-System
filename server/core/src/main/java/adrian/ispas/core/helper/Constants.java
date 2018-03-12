@@ -9,6 +9,6 @@ public class Constants {
     public static final String FILE_PATH = "filepath";
     public static final int MAX_SEARCH = 10;
 
-    public static final String DATA_DIR = "src/main/java/adrian/ispas/core/docs";
-    public static final String INDEX_DIR = "src/main/java/adrian/ispas/core/indexed_docs";
+    public static final String DATA_DIR = "src/main/resources/documents";
+    public static final String INDEX_DIR = "src/main/resources/documents_indexs";
 }

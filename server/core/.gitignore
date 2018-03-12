@@ -92,3 +92,8 @@ transaction-logs
 secrets.yml
 .gradletasknamecache
 .sts4-cache
+
+# Indexed documents
+src/main/resources/documents_indexs
+src/main/resources/documents
+src/main/resources/dictionary
