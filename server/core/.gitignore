@@ -95,5 +95,6 @@ secrets.yml
 
 # Indexed documents
 src/main/resources/documents_indexs
+src/main/resources/documents_indexs/write.lock
 src/main/resources/documents
 src/main/resources/dictionary
