@@ -94,7 +94,7 @@ secrets.yml
 .sts4-cache
 
 # Indexed documents
-src/main/resources/documents_indexs
-src/main/resources/documents_indexs/write.lock
+src/main/resources/documents_indexes
+src/main/resources/documents_indexes/write.lock
 src/main/resources/documents
 src/main/resources/dictionary
