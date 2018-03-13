@@ -19,20 +19,20 @@
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.3/angular.min.js"></script>
   </head>
 
-  <body ng-app="myApp">
+  <body ng-app="kingRetrieval">
 
     <main role="main" class="container">
-      <div ng-controller="myCtrl">
+      <div ng-controller="inputQueryController">
         <div class="system-name">
           <p class="display-4" align="center">King Retrieval</p>
         </div>
 
         <div class="input-group">
-          <input type="text" class="form-control" placeholder="Căutarea ta începe de aici ..." aria-label="Căutarea ta începe de aici ..." aria-describedby="basic-addon2">
-          <button type="submit" ng-click="myFunc()" class="btn btn-success">Submit</button>
+          <input ng-change="getResults()" ng-model='query' type="text" class="form-control" placeholder="Căutarea ta începe de aici ..." aria-label="Căutarea ta începe de aici ..." aria-describedby="basic-addon2">
+          <button type="submit" ng-click="getResults()" class="btn btn-success">Submit</button>
         </div>
 
-          <p>Your query is {{data}}</p>
+          <p>{{results.data.content}}</p>
       </div>
 
     </main>
