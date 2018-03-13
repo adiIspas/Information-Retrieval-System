@@ -27,7 +27,6 @@ public class Searcher {
 
     public Searcher(String indexDirectoryPath) throws IOException {
         Directory indexDirectory = FSDirectory.open(Paths.get(indexDirectoryPath));
-//        Directory indexDirectory = new RAMDirectory();
         DirectoryReader directoryReader = DirectoryReader.open(indexDirectory);
 
         indexSearcher = new IndexSearcher(directoryReader);

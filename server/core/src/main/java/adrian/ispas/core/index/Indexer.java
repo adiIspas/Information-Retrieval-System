@@ -27,7 +27,6 @@ public class Indexer {
     public Indexer(String indexDirectoryPath) throws IOException {
         // Set directory, analyzer and configuration
         Directory indexDirectory = FSDirectory.open(Paths.get(indexDirectoryPath));
-//        Directory indexDirectory = new RAMDirectory();
         StandardAnalyzer analyzer = new StandardAnalyzer();
         IndexWriterConfig indexWriterConfig = new IndexWriterConfig(analyzer);
 

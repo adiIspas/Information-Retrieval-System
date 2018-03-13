@@ -3,29 +3,37 @@ package adrian.ispas.core.api;
 import adrian.ispas.core.index.Indexer;
 import adrian.ispas.core.retrive.SearchDocs;
 import org.apache.log4j.Logger;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
 
 
 /**
  * Created by Adrian Ispas on Mar, 2018
  */
 @RestController
+@Service
 public class QueryAPI {
 
     private static final Logger LOG = Logger.getLogger(Indexer.class);
 
+    @CrossOrigin(origins = "*")
     @RequestMapping(value = "/", method = RequestMethod.GET)
-    public String query(@RequestParam(value = "query") String query) {
+    @ResponseBody
+    public ResponseEntity query(@RequestParam(value = "query") String query) {
+        HashMap<String, String> response = new HashMap<>();
         try {
-            return "Results for your query [\"" + query + "\"] is\n" + SearchDocs.search(query);
+            response.put("content", "Results for your query [\"" + query + "\"] is\n\n" + SearchDocs.search(query));
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
             LOG.error("Error: Your query can't be executed because: " + e);
         }
 
-        return "Something is wrong ... try again later.";
+        response.put("content", "Something is wrong ... try again later.");
+        return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
     }
 }
 
