@@ -8,6 +8,9 @@ import org.apache.lucene.search.TopDocs;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by Adrian Ispas on Mar, 2018
@@ -16,7 +19,9 @@ import java.io.IOException;
 public class SearchDocsImpl implements SearchDocsService {
 
     @Override
-    public String search(String query) {
+    public List search(String query) {
+        List results = new ArrayList<>();
+
         Searcher searcher = null;
         try {
             searcher = new Searcher(Constants.INDEX_DIR);
@@ -40,14 +45,18 @@ public class SearchDocsImpl implements SearchDocsService {
 
         for(ScoreDoc scoreDoc : hits.scoreDocs) {
             Document doc = null;
+            HashMap<String, String> oneResult = new HashMap<>();
             try {
                 doc = searcher.getDocument(scoreDoc);
+                oneResult.put("fileName",doc.get(Constants.FILE_NAME));
+                oneResult.put("relativePath","calea/relativa/in/lucru");
+                oneResult.put("contentExtracted",doc.get(Constants.CONTENTS));
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            result += "\n" + "File: " + doc.get(Constants.FILE_NAME);
+            results.add(oneResult);
         }
 
-        return result;
+        return results;
     }
 }
