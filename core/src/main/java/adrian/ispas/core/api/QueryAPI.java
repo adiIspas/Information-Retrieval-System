@@ -30,16 +30,22 @@ public class QueryAPI {
     @RequestMapping(value = "/", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity query(@RequestParam(value = "query") String query) {
-        HashMap<String, List> response = new HashMap<>();
+        HashMap<String, Object> resultResponse = new HashMap<>();
+
         try {
-            response.put("results", searchDocsService.search(query));
-            return new ResponseEntity<>(response, HttpStatus.OK);
+            HashMap<String, Object> queryResults = searchDocsService.search(query);
+            resultResponse.put("results", queryResults.get("results"));
+            resultResponse.put("timeOfExecution", queryResults.get("timeOfExecution"));
+            resultResponse.put("totalResults", queryResults.get("totalResults"));
+            return new ResponseEntity<>(resultResponse, HttpStatus.OK);
         } catch (Exception e) {
             LOG.error("Error: Your query can't be executed because: " + e);
         }
 
-        response.put("results", new ArrayList());
-        return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
+        resultResponse.put("results", new ArrayList());
+        resultResponse.put("timeOfExecution", 0);
+        resultResponse.put("totalResults", 0);
+        return new ResponseEntity<>(resultResponse, HttpStatus.NO_CONTENT);
     }
 }
 

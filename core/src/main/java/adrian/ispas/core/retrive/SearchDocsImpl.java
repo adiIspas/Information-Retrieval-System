@@ -19,7 +19,8 @@ import java.util.List;
 public class SearchDocsImpl implements SearchDocsService {
 
     @Override
-    public List search(String query) {
+    public HashMap<String, Object> search(String query) {
+        HashMap<String, Object> queryResults = new HashMap<>();
         List results = new ArrayList<>();
 
         Searcher searcher = null;
@@ -39,10 +40,6 @@ public class SearchDocsImpl implements SearchDocsService {
         }
         long endTime = System.currentTimeMillis();
 
-        String result = "";
-
-        result += hits.totalHits + " documents found. Time :" + (endTime - startTime);
-
         for(ScoreDoc scoreDoc : hits.scoreDocs) {
             Document doc = null;
             HashMap<String, String> oneResult = new HashMap<>();
@@ -57,6 +54,10 @@ public class SearchDocsImpl implements SearchDocsService {
             results.add(oneResult);
         }
 
-        return results;
+        queryResults.put("results", results);
+        queryResults.put("timeOfExecution", endTime - startTime);
+        queryResults.put("totalResults", hits.totalHits);
+
+        return queryResults;
     }
 }
