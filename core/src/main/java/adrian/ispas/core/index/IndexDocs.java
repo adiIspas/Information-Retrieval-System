@@ -11,6 +11,8 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 
 /**
+ * IndexDocs is a job profile used when is wanted to reindex new documents
+ *
  * Created by Adrian Ispas on Mar, 2018
  */
 @Component
@@ -22,6 +24,7 @@ public class IndexDocs implements ApplicationListener<ContextRefreshedEvent> {
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
         Indexer indexer = null;
+
         try {
             indexer = new Indexer(Constants.INDEX_DIR);
         } catch (IOException e) {
@@ -29,7 +32,6 @@ public class IndexDocs implements ApplicationListener<ContextRefreshedEvent> {
         }
 
         Integer totalIndexes = 0;
-
         Long startTime = System.currentTimeMillis();
         try {
             if (indexer != null) {
