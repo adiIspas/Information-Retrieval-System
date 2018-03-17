@@ -1,3 +1,4 @@
+
 # Information-Retrieval-System
 
 ## Server build status
@@ -12,7 +13,7 @@ A basic Information retrieval system for Romanian language.
 
 ## Instruction to use
 ### Requirements
- - Maven
+ - Maven 3+
  - Java 8+
 
 ### Run
@@ -20,7 +21,13 @@ A basic Information retrieval system for Romanian language.
     
     cd Information-Retrieval-System/
     
-    cd server/core && mvn package && java -jar target/core-{VERSION}-SNAPSHOT.jar 
+    bash run.sh latest-version
+
+For index documents run
+
+    bash index.sh latest-version
+
+Please check [releases](https://github.com/adiIspas/Information-Retrieval-System/releases) for latest version
 <br>
 <br>
 
