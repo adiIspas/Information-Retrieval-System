@@ -2,7 +2,6 @@ package adrian.ispas.core.index;
 
 import adrian.ispas.core.helper.Constants;
 import org.apache.log4j.Logger;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.TextField;
@@ -27,8 +26,7 @@ public class Indexer {
 
     public Indexer(String indexDirectoryPath) throws IOException {
         Directory indexDirectory = FSDirectory.open(Paths.get(indexDirectoryPath));
-        StandardAnalyzer analyzer = new StandardAnalyzer();
-        IndexWriterConfig indexWriterConfig = new IndexWriterConfig(analyzer);
+        IndexWriterConfig indexWriterConfig = new IndexWriterConfig(Constants.Analyzer.getAnalyzer());
 
         writer = new IndexWriter(indexDirectory, indexWriterConfig);
     }
@@ -72,8 +70,12 @@ public class Indexer {
 
         if (files != null) {
             for (File file : files) {
-                if (checkFileAvailability(file, filter)) {
-                    indexFile(file);
+                if (file.isFile()) {
+                    if (checkFileAvailability(file, filter)) {
+                        indexFile(file);
+                    }
+                } else if (file.isDirectory()) {
+                    createIndex(file.getAbsolutePath(), filter);
                 }
             }
         } else {
