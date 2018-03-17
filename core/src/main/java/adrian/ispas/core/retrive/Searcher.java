@@ -1,6 +1,7 @@
 package adrian.ispas.core.retrive;
 
 import adrian.ispas.core.helper.Constants;
+import org.apache.lucene.analysis.ro.RomanianAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
@@ -32,7 +33,7 @@ public class Searcher {
         DirectoryReader directoryReader = DirectoryReader.open(indexDirectory);
 
         indexSearcher = new IndexSearcher(directoryReader);
-        queryParser = new QueryParser(Constants.CONTENTS, new StandardAnalyzer());
+        queryParser = new QueryParser(Constants.CONTENTS, Constants.Analyzer.getAnalyzer());
     }
 
     /**
