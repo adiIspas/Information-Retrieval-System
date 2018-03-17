@@ -17,15 +17,17 @@ import java.io.IOException;
 import java.nio.file.Paths;
 
 /**
+ * Searcher init a IndexSearcher and a QueryParser and expose methods for get results from a query and get documents
+ * from a result
+ *
  * Created by Adrian Ispas on Mar, 2018
  */
 public class Searcher {
 
     private IndexSearcher indexSearcher;
     private QueryParser queryParser;
-    private Query query;
 
-    public Searcher(String indexDirectoryPath) throws IOException {
+    Searcher(String indexDirectoryPath) throws IOException {
         Directory indexDirectory = FSDirectory.open(Paths.get(indexDirectoryPath));
         DirectoryReader directoryReader = DirectoryReader.open(indexDirectory);
 
@@ -33,12 +35,25 @@ public class Searcher {
         queryParser = new QueryParser(Constants.CONTENTS, new StandardAnalyzer());
     }
 
-    public TopDocs search(String searchQuery) throws ParseException, IOException {
-        query = queryParser.parse(searchQuery);
+    /**
+     * Return indexed documents based on query
+     * @param searchQuery Query used for search
+     * @return TopDocs matched with query
+     * @throws ParseException If query can't be parsed
+     * @throws IOException If documents doesn't exit
+     */
+    TopDocs search(String searchQuery) throws ParseException, IOException {
+        Query query = queryParser.parse(searchQuery);
         return indexSearcher.search(query, Constants.MAX_SEARCH);
     }
 
-    public Document getDocument(ScoreDoc scoreDoc) throws IOException {
+    /**
+     * Get a document from indexed document
+     * @param scoreDoc Indexed document
+     * @return Document from indexed document
+     * @throws IOException If documents doesn't exit
+     */
+    Document getDocument(ScoreDoc scoreDoc) throws IOException {
         return indexSearcher.doc(scoreDoc.doc);
     }
 }

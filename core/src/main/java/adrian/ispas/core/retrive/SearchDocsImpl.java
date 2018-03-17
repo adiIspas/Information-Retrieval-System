@@ -1,6 +1,7 @@
 package adrian.ispas.core.retrive;
 
 import adrian.ispas.core.helper.Constants;
+import org.apache.log4j.Logger;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.search.ScoreDoc;
@@ -18,45 +19,61 @@ import java.util.List;
 @Service(value = "searchDocsService")
 public class SearchDocsImpl implements SearchDocsService {
 
+    private static final Logger LOG = Logger.getLogger(SearchDocsImpl.class);
+
     @Override
     public HashMap<String, Object> search(String query) {
         HashMap<String, Object> queryResults = new HashMap<>();
-        List results = new ArrayList<>();
+        List<HashMap> results = new ArrayList<>();
+        Boolean passed;
 
         Searcher searcher = null;
         try {
             searcher = new Searcher(Constants.INDEX_DIR);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.error("Can't instantiate a Searcher object because: " + e);
         }
-        long startTime = System.currentTimeMillis();
+
         TopDocs hits = null;
+        long startTime = System.currentTimeMillis();
         try {
-            hits = searcher.search(query);
-        } catch (ParseException e) {
+            if (searcher != null) {
+                hits = searcher.search(query);
+                passed = true;
+            } else {
+                LOG.error("Searcher object is null");
+                passed = false;
+            }
+        } catch (Exception e) {
             e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+            passed = false;
         }
         long endTime = System.currentTimeMillis();
 
-        for(ScoreDoc scoreDoc : hits.scoreDocs) {
-            Document doc = null;
-            HashMap<String, String> oneResult = new HashMap<>();
-            try {
-                doc = searcher.getDocument(scoreDoc);
-                oneResult.put("fileName",doc.get(Constants.FILE_NAME));
-                oneResult.put("relativePath","calea/relativa/in/lucru");
-                oneResult.put("contentExtracted",doc.get(Constants.CONTENTS));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            results.add(oneResult);
-        }
+        if (hits != null && passed) {
+            for (ScoreDoc scoreDoc : hits.scoreDocs) {
+                Document doc;
+                HashMap<String, String> oneResult = new HashMap<>();
+                try {
+                    doc = searcher.getDocument(scoreDoc);
 
-        queryResults.put("results", results);
-        queryResults.put("timeOfExecution", endTime - startTime);
-        queryResults.put("totalResults", hits.totalHits);
+                    oneResult.put("fileName", doc.get(Constants.FILE_NAME));
+                    oneResult.put("relativePath", "calea/relativa/in/lucru");
+                    oneResult.put("contentExtracted", doc.get(Constants.CONTENTS));
+
+                    results.add(oneResult);
+                } catch (IOException e) {
+                    LOG.error("Can't load documents because: " + e);
+                    passed = false;
+                }
+            }
+
+            if (passed) {
+                queryResults.put("results", results);
+                queryResults.put("timeOfExecution", endTime - startTime);
+                queryResults.put("totalResults", hits.totalHits);
+            }
+        }
 
         return queryResults;
     }
