@@ -25,7 +25,7 @@ A basic Information retrieval system for Romanian language.
 
 For index documents run
 
-`bash index.sh latest-version` 
+    bash index.sh latest-version
 
 Please check [releases](https://github.com/adiIspas/Information-Retrieval-System/releases) for latest version
 <br>
