@@ -1,6 +1,6 @@
 package adrian.ispas.core.helper;
 
-import org.apache.lucene.analysis.ro.RomanianAnalyzer;
+import adrian.ispas.core.helper.analyzer.MyRomanianAnalyzer;
 
 /**
  * Store all constants used in system
@@ -20,20 +20,20 @@ public class Constants {
 
     /** Analyzer used in whole project. Use default stop words list */
     public static class Analyzer {
-        private static volatile RomanianAnalyzer instance;
+        private static volatile MyRomanianAnalyzer instance;
         private static final Object mutex = new Object();
 
         private Analyzer() {}
 
-        public static RomanianAnalyzer getAnalyzer() {
-            RomanianAnalyzer result = instance;
+        public static MyRomanianAnalyzer  getAnalyzer() {
+            MyRomanianAnalyzer  result = instance;
 
             if (result == null) {
                 synchronized (mutex) {
                     result = instance;
 
                     if (result == null) {
-                        instance = result = new RomanianAnalyzer();
+                        instance = result = new MyRomanianAnalyzer();
                     }
                 }
             }
