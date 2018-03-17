@@ -1,8 +1,6 @@
 package adrian.ispas.core.retrive;
 
-import adrian.ispas.core.helper.Constants;
-import org.apache.lucene.analysis.ro.RomanianAnalyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import adrian.ispas.helper.Constants;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.queryparser.classic.ParseException;

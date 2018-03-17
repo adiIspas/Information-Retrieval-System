@@ -1,4 +1,4 @@
-package adrian.ispas.core.helper.analyzer;
+package adrian.ispas.helper.analyzer;
 
 import java.io.IOException;
 import org.apache.lucene.analysis.CharArraySet;

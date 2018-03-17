@@ -4,12 +4,12 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>adrian.ispas</groupId>
-	<artifactId>core</artifactId>
-	<version>0.1.1-SNAPSHOT</version>
+	<artifactId>helper</artifactId>
+	<version>0.2.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>core</name>
-	<description>Server for a Information retrieval system.</description>
+	<name>helper</name>
+	<description>Helper module for core</description>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -29,48 +29,20 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/org.apache.lucene/lucene-core -->
+		<!-- https://mvnrepository.com/artifact/org.apache.lucene/lucene-analyzers-common -->
 		<dependency>
 			<groupId>org.apache.lucene</groupId>
-			<artifactId>lucene-core</artifactId>
+			<artifactId>lucene-analyzers-common</artifactId>
 			<version>7.2.1</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.apache.lucene/lucene-queryparser -->
-		<dependency>
-			<groupId>org.apache.lucene</groupId>
-			<artifactId>lucene-queryparser</artifactId>
-			<version>7.2.1</version>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/log4j/log4j -->
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.17</version>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.apache.pdfbox/pdfbox -->
-		<dependency>
-			<groupId>org.apache.pdfbox</groupId>
-			<artifactId>pdfbox</artifactId>
-			<version>2.0.8</version>
-		</dependency>
-
-
-		<dependency>
-            <groupId>adrian.ispas</groupId>
-            <artifactId>helper</artifactId>
-            <version>0.2.0-SNAPSHOT</version>
-        </dependency>
-    </dependencies>
+	</dependencies>
 
 	<build>
 		<plugins>

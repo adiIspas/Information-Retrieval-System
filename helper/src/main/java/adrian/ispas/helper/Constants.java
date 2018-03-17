@@ -1,6 +1,12 @@
-package adrian.ispas.core.helper;
+package adrian.ispas.helper;
 
-import adrian.ispas.core.helper.analyzer.MyRomanianAnalyzer;
+import adrian.ispas.helper.analyzer.MyRomanianAnalyzer;
+import adrian.ispas.helper.filters.PdfFileFilter;
+import adrian.ispas.helper.filters.TextFileFilter;
+
+import java.io.FileFilter;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Store all constants used in system
@@ -15,8 +21,17 @@ public class Constants {
     public static final int MAX_SEARCH = 10;
 
     /** Constants about store place for raw and indexed documents */
-    public static final String DATA_DIR = "core/src/main/resources/documents";
-    public static final String INDEX_DIR = "core/src/main/resources/documents_indexes";
+    public static final String DATA_DIR = "helper/src/main/resources/documents";
+    public static final String INDEX_DIR = "helper/src/main/resources/documents_indexes";
+
+    public static class FileFilters {
+        public static List<FileFilter> filters = new ArrayList<>();
+
+        static {
+            filters.add(new TextFileFilter());
+            filters.add(new PdfFileFilter());
+        }
+    }
 
     /** Analyzer used in whole project. Use default stop words list */
     public static class Analyzer {

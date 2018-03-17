@@ -1,4 +1,4 @@
-package adrian.ispas.core.helper;
+package adrian.ispas.helper.filters;
 
 import java.io.File;
 import java.io.FileFilter;
