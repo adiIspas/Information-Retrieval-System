@@ -27,11 +27,11 @@ public final class MyRomanianAnalyzer extends StopwordAnalyzerBase {
     private static final String STOPWORDS_COMMENT = "#";
 
     public static CharArraySet getDefaultStopSet() {
-        return MyRomanianAnalyzer.DefaultSetHolder.DEFAULT_STOP_SET;
+        return DefaultSetHolder.DEFAULT_STOP_SET;
     }
 
     public MyRomanianAnalyzer() {
-        this(MyRomanianAnalyzer.DefaultSetHolder.DEFAULT_STOP_SET);
+        this(DefaultSetHolder.DEFAULT_STOP_SET);
     }
 
     public MyRomanianAnalyzer(CharArraySet stopwords) {

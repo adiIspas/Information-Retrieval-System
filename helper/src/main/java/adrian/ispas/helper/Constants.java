@@ -40,7 +40,7 @@ public class Constants {
 
         private Analyzer() {}
 
-        public static MyRomanianAnalyzer  getAnalyzer() {
+        public static MyRomanianAnalyzer getAnalyzer() {
             MyRomanianAnalyzer  result = instance;
 
             if (result == null) {
