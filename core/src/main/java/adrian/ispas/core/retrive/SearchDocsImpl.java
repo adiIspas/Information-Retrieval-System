@@ -1,9 +1,8 @@
 package adrian.ispas.core.retrive;
 
-import adrian.ispas.core.helper.Constants;
+import adrian.ispas.helper.Constants;
 import org.apache.log4j.Logger;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.springframework.stereotype.Service;
@@ -58,7 +57,7 @@ public class SearchDocsImpl implements SearchDocsService {
                     doc = searcher.getDocument(scoreDoc);
 
                     oneResult.put("fileName", doc.get(Constants.FILE_NAME));
-                    oneResult.put("relativePath", "calea/relativa/in/lucru");
+                    oneResult.put("relativePath", doc.get(Constants.FILE_PATH));
                     oneResult.put("contentExtracted", doc.get(Constants.CONTENTS));
 
                     results.add(oneResult);

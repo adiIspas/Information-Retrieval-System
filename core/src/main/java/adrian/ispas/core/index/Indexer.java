@@ -1,6 +1,6 @@
 package adrian.ispas.core.index;
 
-import adrian.ispas.core.helper.Constants;
+import adrian.ispas.helper.Constants;
 import org.apache.log4j.Logger;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -9,9 +9,13 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
 
 import java.io.*;
+import java.nio.file.FileSystems;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -39,9 +43,11 @@ public class Indexer {
      */
     private Document extractDocumentFrom(File file) throws IOException {
         Document document = new Document();
+        String currentPath = FileSystems.getDefault().getPath("").toAbsolutePath().toString();
 
         document.add(new Field(Constants.FILE_NAME, file.getName(), TextField.TYPE_STORED));
-        document.add(new Field(Constants.CONTENTS, new Scanner(file).useDelimiter("\\A").next(), TextField.TYPE_STORED));
+        document.add(new Field(Constants.FILE_PATH, file.getAbsolutePath().replace(currentPath, ""), TextField.TYPE_STORED));
+        document.add(new Field(Constants.CONTENTS, extractContent(file), TextField.TYPE_STORED));
 
         return document;
     }
@@ -61,21 +67,21 @@ public class Indexer {
     /**
      * Create indexes from all documents from a folder
      * @param directoryPath Path to the directory with files
-     * @param filter Filter for documents, types of accepted documents
+     * @param filters Filter for documents, types of accepted documents
      * @return Total number of documents indexed
      * @throws IOException If directory doesn't exist
      */
-    public int createIndex(String directoryPath, FileFilter filter) throws IOException {
+    public int createIndex(String directoryPath, List<FileFilter> filters) throws IOException {
         File[] files = new File(directoryPath).listFiles();
 
         if (files != null) {
             for (File file : files) {
                 if (file.isFile()) {
-                    if (checkFileAvailability(file, filter)) {
+                    if (checkFileAvailability(file, filters)) {
                         indexFile(file);
                     }
                 } else if (file.isDirectory()) {
-                    createIndex(file.getAbsolutePath(), filter);
+                    createIndex(file.getAbsolutePath(), filters);
                 }
             }
         } else {
@@ -99,14 +105,39 @@ public class Indexer {
     /**
      * Check if a file is available to be indexed
      * @param file File that should be checked
-     * @param filter Filter for files
+     * @param filters A list of filters for files extension
      * @return Availability of file
      */
-    private Boolean checkFileAvailability(File file, FileFilter filter) {
+    private Boolean checkFileAvailability(File file, List<FileFilter> filters) {
         return !file.isDirectory() &&
                 !file.isHidden() &&
                 file.exists() &&
                 file.canRead() &&
-                filter.accept(file);
+                filters.stream().anyMatch(t -> t.accept(file));
+    }
+
+    /**
+     * Extract content from all supported types of files
+     * @param file File for that is wanted to extracts it content
+     * @return Content of file
+     */
+    private String extractContent(File file) {
+        String text = "";
+        // TO DO: Improve this hotchpotch :) No idea how, now ...
+        try {
+            return new Scanner(file).useDelimiter("\\A").next();
+        } catch (Exception e) {
+            LOG.error("This file " + file.getName() + " can't be read as txt file because " + e);
+        } finally {
+            try {
+                PDDocument document = PDDocument.load(file);
+                PDFTextStripper stripper = new PDFTextStripper();
+                text = stripper.getText(document);
+            } catch (IOException e) {
+                LOG.error("This file " + file.getName() + " can't be read as pdf file because " + e);
+            }
+        }
+
+        return text;
     }
 }

@@ -1,7 +1,6 @@
 package adrian.ispas.core.index;
 
-import adrian.ispas.core.helper.Constants;
-import adrian.ispas.core.helper.TextFileFilter;
+import adrian.ispas.helper.Constants;
 import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Profile;
@@ -35,7 +34,7 @@ public class IndexDocs implements ApplicationListener<ContextRefreshedEvent> {
         Long startTime = System.currentTimeMillis();
         try {
             if (indexer != null) {
-                totalIndexes = indexer.createIndex(Constants.DATA_DIR, new TextFileFilter());
+                totalIndexes = indexer.createIndex(Constants.DATA_DIR, Constants.FileFilters.filters);
             }
         } catch (IOException e) {
             LOG.error("Error: Create indexes failed because: " + e);
