@@ -1,8 +1,7 @@
 package adrian.ispas.helper;
 
 import adrian.ispas.helper.analyzer.MyRomanianAnalyzer;
-import adrian.ispas.helper.filters.PdfFileFilter;
-import adrian.ispas.helper.filters.TextFileFilter;
+import adrian.ispas.helper.filters.*;
 
 import java.io.FileFilter;
 import java.util.ArrayList;
@@ -24,12 +23,17 @@ public class Constants {
     public static final String DATA_DIR = "helper/src/main/resources/documents";
     public static final String INDEX_DIR = "helper/src/main/resources/documents_indexes";
 
+    /** Types of file supported for index */
     public static class FileFilters {
         public static List<FileFilter> filters = new ArrayList<>();
 
         static {
             filters.add(new TextFileFilter());
             filters.add(new PdfFileFilter());
+            filters.add(new HtmlFileFilter());
+            filters.add(new DocxFileFilter());
+            filters.add(new PptxFileFormat());
+            filters.add(new RtfFileFilter());
         }
     }
 

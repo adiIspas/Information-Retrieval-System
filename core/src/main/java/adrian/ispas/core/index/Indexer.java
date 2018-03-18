@@ -4,19 +4,19 @@ import adrian.ispas.helper.Constants;
 import org.apache.log4j.Logger;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.text.PDFTextStripper;
+import org.apache.tika.Tika;
+import org.apache.tika.exception.TikaException;
 
 import java.io.*;
 import java.nio.file.FileSystems;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Scanner;
 
 /**
  * Indexed is used to extract documents from a specific path and index in system
@@ -45,9 +45,9 @@ public class Indexer {
         Document document = new Document();
         String currentPath = FileSystems.getDefault().getPath("").toAbsolutePath().toString();
 
-        document.add(new Field(Constants.FILE_NAME, file.getName(), TextField.TYPE_STORED));
-        document.add(new Field(Constants.FILE_PATH, file.getAbsolutePath().replace(currentPath, ""), TextField.TYPE_STORED));
-        document.add(new Field(Constants.CONTENTS, extractContent(file), TextField.TYPE_STORED));
+        document.add(new StringField(Constants.FILE_NAME, file.getName(), Field.Store.YES));
+        document.add(new StringField(Constants.FILE_PATH, file.getAbsolutePath().replace(currentPath, ""), Field.Store.YES));
+        document.add(new TextField(Constants.CONTENTS, extractContent(file), Field.Store.YES));
 
         return document;
     }
@@ -122,22 +122,15 @@ public class Indexer {
      * @return Content of file
      */
     private String extractContent(File file) {
-        String text = "";
-        // TO DO: Improve this hotchpotch :) No idea how, now ...
+        String fileContent = "";
+        Tika tika = new Tika();
+
         try {
-            return new Scanner(file).useDelimiter("\\A").next();
-        } catch (Exception e) {
-            LOG.error("This file " + file.getName() + " can't be read as txt file because " + e);
-        } finally {
-            try {
-                PDDocument document = PDDocument.load(file);
-                PDFTextStripper stripper = new PDFTextStripper();
-                text = stripper.getText(document);
-            } catch (IOException e) {
-                LOG.error("This file " + file.getName() + " can't be read as pdf file because " + e);
-            }
+            return tika.parseToString(file);
+        } catch (IOException | TikaException e) {
+            LOG.error("Your file content can't be read because: " + e);
         }
 
-        return text;
+        return fileContent;
     }
 }
