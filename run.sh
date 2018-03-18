@@ -2,6 +2,6 @@
 CURRENT_VERSION=$1
 
 cd core
-mvn package
+mvn clean package
 cd ..
 java -jar core/target/core-${CURRENT_VERSION}-SNAPSHOT.jar
