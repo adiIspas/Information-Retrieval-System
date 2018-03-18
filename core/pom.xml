@@ -5,7 +5,7 @@
 
 	<groupId>adrian.ispas</groupId>
 	<artifactId>core</artifactId>
-	<version>0.1.1-SNAPSHOT</version>
+	<version>1.0.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>core</name>
@@ -73,7 +73,7 @@
 		<dependency>
 			<groupId>adrian.ispas</groupId>
 			<artifactId>helper</artifactId>
-			<version>0.1.1-SNAPSHOT</version>
+			<version>1.0.0-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 
@@ -82,6 +82,10 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
 	</build>
