@@ -1,19 +1,22 @@
 package adrian.ispas.core.index;
 
-import adrian.ispas.core.helper.Constants;
+import adrian.ispas.helper.Constants;
 import org.apache.log4j.Logger;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.apache.tika.Tika;
+import org.apache.tika.exception.TikaException;
 
 import java.io.*;
+import java.nio.file.FileSystems;
 import java.nio.file.Paths;
-import java.util.Scanner;
+import java.util.List;
 
 /**
  * Indexed is used to extract documents from a specific path and index in system
@@ -27,8 +30,7 @@ public class Indexer {
 
     public Indexer(String indexDirectoryPath) throws IOException {
         Directory indexDirectory = FSDirectory.open(Paths.get(indexDirectoryPath));
-        StandardAnalyzer analyzer = new StandardAnalyzer();
-        IndexWriterConfig indexWriterConfig = new IndexWriterConfig(analyzer);
+        IndexWriterConfig indexWriterConfig = new IndexWriterConfig(Constants.Analyzer.getAnalyzer());
 
         writer = new IndexWriter(indexDirectory, indexWriterConfig);
     }
@@ -41,9 +43,11 @@ public class Indexer {
      */
     private Document extractDocumentFrom(File file) throws IOException {
         Document document = new Document();
+        String currentPath = FileSystems.getDefault().getPath("").toAbsolutePath().toString();
 
-        document.add(new Field(Constants.FILE_NAME, file.getName(), TextField.TYPE_STORED));
-        document.add(new Field(Constants.CONTENTS, new Scanner(file).useDelimiter("\\A").next(), TextField.TYPE_STORED));
+        document.add(new StringField(Constants.FILE_NAME, file.getName(), Field.Store.YES));
+        document.add(new StringField(Constants.FILE_PATH, file.getAbsolutePath().replace(currentPath, ""), Field.Store.YES));
+        document.add(new TextField(Constants.CONTENTS, extractContent(file), Field.Store.YES));
 
         return document;
     }
@@ -63,17 +67,21 @@ public class Indexer {
     /**
      * Create indexes from all documents from a folder
      * @param directoryPath Path to the directory with files
-     * @param filter Filter for documents, types of accepted documents
+     * @param filters Filter for documents, types of accepted documents
      * @return Total number of documents indexed
      * @throws IOException If directory doesn't exist
      */
-    public int createIndex(String directoryPath, FileFilter filter) throws IOException {
+    public int createIndex(String directoryPath, List<FileFilter> filters) throws IOException {
         File[] files = new File(directoryPath).listFiles();
 
         if (files != null) {
             for (File file : files) {
-                if (checkFileAvailability(file, filter)) {
-                    indexFile(file);
+                if (file.isFile()) {
+                    if (checkFileAvailability(file, filters)) {
+                        indexFile(file);
+                    }
+                } else if (file.isDirectory()) {
+                    createIndex(file.getAbsolutePath(), filters);
                 }
             }
         } else {
@@ -97,14 +105,32 @@ public class Indexer {
     /**
      * Check if a file is available to be indexed
      * @param file File that should be checked
-     * @param filter Filter for files
+     * @param filters A list of filters for files extension
      * @return Availability of file
      */
-    private Boolean checkFileAvailability(File file, FileFilter filter) {
+    private Boolean checkFileAvailability(File file, List<FileFilter> filters) {
         return !file.isDirectory() &&
                 !file.isHidden() &&
                 file.exists() &&
                 file.canRead() &&
-                filter.accept(file);
+                filters.stream().anyMatch(t -> t.accept(file));
+    }
+
+    /**
+     * Extract content from all supported types of files
+     * @param file File for that is wanted to extracts it content
+     * @return Content of file
+     */
+    private String extractContent(File file) {
+        String fileContent = "";
+        Tika tika = new Tika();
+
+        try {
+            return tika.parseToString(file);
+        } catch (IOException | TikaException e) {
+            LOG.error("Your file content can't be read because: " + e);
+        }
+
+        return fileContent;
     }
 }
