@@ -4,6 +4,7 @@ import adrian.ispas.helper.analyzer.MyRomanianAnalyzer;
 import adrian.ispas.helper.filters.*;
 
 import java.io.FileFilter;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,6 +14,9 @@ import java.util.List;
  * Created by Adrian Ispas on Mar, 2018
  */
 public class Constants {
+
+    public static final String EXTRA_STOP_WORDS = "/helper/src/main/resources/dictionary/stop-words.txt";
+
     /** Constants about components of indexed documents */
     public static final String CONTENTS = "contents";
     public static final String FILE_NAME = "filename";
@@ -52,7 +56,7 @@ public class Constants {
                     result = instance;
 
                     if (result == null) {
-                        instance = result = new MyRomanianAnalyzer();
+                        instance = result = new MyRomanianAnalyzer(Paths.get(EXTRA_STOP_WORDS));
                     }
                 }
             }
