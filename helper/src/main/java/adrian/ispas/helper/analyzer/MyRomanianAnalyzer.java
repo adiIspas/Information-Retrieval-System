@@ -2,7 +2,6 @@ package adrian.ispas.helper.analyzer;
 
 import org.apache.lucene.analysis.*;
 import org.apache.lucene.analysis.miscellaneous.ASCIIFoldingFilter;
-import org.apache.lucene.analysis.ro.RomanianAnalyzer;
 import org.apache.lucene.analysis.snowball.SnowballFilter;
 import org.apache.lucene.analysis.standard.StandardFilter;
 import org.apache.lucene.analysis.standard.StandardTokenizer;
@@ -14,6 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Objects;
 import java.util.Scanner;
 
 /**
@@ -26,13 +26,8 @@ public class MyRomanianAnalyzer extends Analyzer {
 
     private CharArraySet stopWords;
 
-    public MyRomanianAnalyzer() {
-        this.stopWords = RomanianAnalyzer.getDefaultStopSet();
-    }
-
     public MyRomanianAnalyzer(Path path) {
-        this();
-        this.stopWords.add(loadExtraStopWords(path));
+        this.stopWords = loadStopWords(Objects.requireNonNull(path));
     }
 
     protected TokenStreamComponents createComponents(String fieldName) {
@@ -47,7 +42,7 @@ public class MyRomanianAnalyzer extends Analyzer {
         return new TokenStreamComponents(tokenizer, stream);
     }
 
-    private CharArraySet loadExtraStopWords(Path path) {
+    private CharArraySet loadStopWords(Path path) {
         CharArraySet stopWords = CharArraySet.EMPTY_SET;
         String extraStopWords = "";
         Path absolutePath = FileSystems.getDefault().getPath("").toAbsolutePath();

@@ -15,7 +15,9 @@ import java.util.List;
  */
 public class Constants {
 
-    public static final String EXTRA_STOP_WORDS = "/helper/src/main/resources/dictionary/stop-words.txt";
+    private Constants() {}
+
+    public static final String EXTRA_STOP_WORDS = "/helper/src/main/resources/dictionary/ro-stop-words.txt";
 
     /** Constants about components of indexed documents */
     public static final String CONTENTS = "contents";
@@ -24,7 +26,7 @@ public class Constants {
     public static final int MAX_SEARCH = 10;
 
     /** Constants about store place for raw and indexed documents */
-    public static final String DATA_DIR = "helper/src/main/resources/documents";
+    public static final String DATA_DIR = "helper/src/main/resources/documents/features/diacritics";
     public static final String INDEX_DIR = "helper/src/main/resources/documents_indexes";
 
     /** Types of file supported for index */
@@ -56,7 +58,7 @@ public class Constants {
                     result = instance;
 
                     if (result == null) {
-                        instance = result = new MyRomanianAnalyzer(Paths.get(EXTRA_STOP_WORDS));
+                        instance = result = new MyRomanianAnalyzer(Paths.get(Constants.EXTRA_STOP_WORDS));
                     }
                 }
             }
