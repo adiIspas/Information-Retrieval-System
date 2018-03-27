@@ -15,6 +15,7 @@ import org.apache.tika.exception.TikaException;
 
 import java.io.*;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
@@ -89,6 +90,20 @@ public class Indexer {
         }
 
         return writer.numDocs();
+    }
+
+    public static void deleteIndexes(String directoryPath) throws IOException {
+        File[] files = new File(directoryPath).listFiles();
+
+        if (files != null) {
+            for (File file : files) {
+                if (file.isFile()) {
+                    Files.delete(file.toPath());
+                }
+            }
+        } else {
+            LOG.error("Your directory doesn't contain files.");
+        }
     }
 
     /**
