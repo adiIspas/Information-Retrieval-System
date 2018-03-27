@@ -25,6 +25,7 @@ public class IndexDocs implements ApplicationListener<ContextRefreshedEvent> {
         Indexer indexer = null;
 
         try {
+            Indexer.deleteIndexes(Constants.INDEX_DIR);
             indexer = new Indexer(Constants.INDEX_DIR);
         } catch (IOException e) {
             LOG.error("Error: Create indexer failed because: " + e);

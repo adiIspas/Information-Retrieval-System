@@ -13,6 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.Normalizer;
 import java.util.Objects;
 import java.util.Scanner;
 
@@ -48,7 +49,7 @@ public class MyRomanianAnalyzer extends Analyzer {
         Path absolutePath = FileSystems.getDefault().getPath("").toAbsolutePath();
 
         try(Scanner scanner = new Scanner(Paths.get(absolutePath.toString() + path.toString()), StandardCharsets.UTF_8.name())) {
-            extraStopWords = scanner.useDelimiter("\\A").next();
+            extraStopWords = removeDiacritics(scanner.useDelimiter("\\A").next());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -60,5 +61,9 @@ public class MyRomanianAnalyzer extends Analyzer {
         }
 
         return stopWords;
+    }
+
+    private String removeDiacritics(String initialStopWords) {
+        return Normalizer.normalize(initialStopWords.toLowerCase(), Normalizer.Form.NFKD).replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
     }
 }
