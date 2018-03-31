@@ -25,6 +25,7 @@ public class IndexDocs implements ApplicationListener<ContextRefreshedEvent> {
         Indexer indexer = null;
 
         try {
+            /** Delete old indexes and create new indexer */
             Indexer.deleteIndexes(Constants.INDEX_DIR);
             indexer = new Indexer(Constants.INDEX_DIR);
         } catch (IOException e) {
@@ -34,6 +35,7 @@ public class IndexDocs implements ApplicationListener<ContextRefreshedEvent> {
         Integer totalIndexes = 0;
         Long startTime = System.currentTimeMillis();
         try {
+            /** Create indexes */
             if (indexer != null) {
                 totalIndexes = indexer.createIndex(Constants.DATA_DIR, Constants.FileFilters.filters);
             }

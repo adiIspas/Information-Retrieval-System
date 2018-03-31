@@ -27,10 +27,18 @@ public class MyRomanianAnalyzer extends Analyzer {
 
     private CharArraySet stopWords;
 
-    public MyRomanianAnalyzer(Path path) {
-        this.stopWords = loadStopWords(Objects.requireNonNull(path));
+    /**
+     * @param stopWordPath Path to a file with stop words
+     */
+    public MyRomanianAnalyzer(Path stopWordPath) {
+        this.stopWords = loadStopWords(Objects.requireNonNull(stopWordPath));
     }
 
+    /**
+     * Create index component for every field
+     * @param fieldName Field for is wanted to create a index component
+     * @return Index component
+     */
     protected TokenStreamComponents createComponents(String fieldName) {
         Tokenizer tokenizer = new StandardTokenizer();
         TokenStream stream = new StandardFilter(tokenizer);
@@ -43,6 +51,11 @@ public class MyRomanianAnalyzer extends Analyzer {
         return new TokenStreamComponents(tokenizer, stream);
     }
 
+    /**
+     * Load stop word from a file
+     * @param path Path to stop words file
+     * @return Normalized list of stop words
+     */
     private CharArraySet loadStopWords(Path path) {
         CharArraySet stopWords = CharArraySet.EMPTY_SET;
         String extraStopWords = "";
@@ -63,6 +76,11 @@ public class MyRomanianAnalyzer extends Analyzer {
         return stopWords;
     }
 
+    /**
+     * Remove diacritics from a string
+     * @param initialStopWords Stop words like a string
+     * @return Stop words string without diacritics
+     */
     private String removeDiacritics(String initialStopWords) {
         return Normalizer.normalize(initialStopWords.toLowerCase(), Normalizer.Form.NFKD).replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
     }
