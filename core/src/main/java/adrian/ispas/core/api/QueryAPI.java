@@ -38,6 +38,7 @@ public class QueryAPI {
     public ResponseEntity search(@RequestParam(value = "query") String query) {
         HashMap<String, Object> resultResponse = new HashMap<>();
 
+        /** Search query in indexed documents and return specified data */
         try {
             HashMap<String, Object> queryResults = searchDocsService.search(query);
 

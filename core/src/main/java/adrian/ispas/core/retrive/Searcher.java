@@ -26,6 +26,10 @@ public class Searcher {
     private IndexSearcher indexSearcher;
     private QueryParser queryParser;
 
+    /**
+     * @param indexDirectoryPath Path to indexes directory
+     * @throws IOException Path can't exist
+     */
     Searcher(String indexDirectoryPath) throws IOException {
         Directory indexDirectory = FSDirectory.open(Paths.get(indexDirectoryPath));
         DirectoryReader directoryReader = DirectoryReader.open(indexDirectory);
