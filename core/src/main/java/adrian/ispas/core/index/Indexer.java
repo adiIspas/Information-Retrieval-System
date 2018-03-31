@@ -29,6 +29,10 @@ public class Indexer {
     private static final Logger LOG = Logger.getLogger(Indexer.class);
     private IndexWriter writer;
 
+    /**
+     * @param indexDirectoryPath Path to directory where indexes will be stored
+     * @throws IOException Path can't exist
+     */
     public Indexer(String indexDirectoryPath) throws IOException {
         Directory indexDirectory = FSDirectory.open(Paths.get(indexDirectoryPath));
         IndexWriterConfig indexWriterConfig = new IndexWriterConfig(Constants.Analyzer.getAnalyzer());
@@ -92,6 +96,11 @@ public class Indexer {
         return writer.numDocs();
     }
 
+    /**
+     * Delete all old indexes
+     * @param directoryPath Path to indexes directory
+     * @throws IOException Path can't exist
+     */
     public static void deleteIndexes(String directoryPath) throws IOException {
         File[] files = new File(directoryPath).listFiles();
 
