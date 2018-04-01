@@ -68,7 +68,7 @@ public class SearchDocsImpl implements SearchDocsService {
                     doc = searcher.getDocument(scoreDoc);
 
                     oneResult.put("fileName", doc.get(Constants.FILE_NAME));
-                    oneResult.put("relativePath", doc.get(Constants.FILE_PATH));
+                    oneResult.put("relativePath", ProcessesResults.processesPath(doc.get(Constants.FILE_PATH), Constants.PATH_DELIMITER, Constants.PATH_STARTER));
                     oneResult.put("contentExtracted", doc.get(Constants.CONTENTS));
 
                     results.add(oneResult);

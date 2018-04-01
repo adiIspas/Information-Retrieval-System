@@ -44,6 +44,10 @@ public class Constants {
         }
     }
 
+    /** Constants used for make a path with a specified format */
+    public static final String PATH_DELIMITER = "/";
+    public static final String PATH_STARTER = "documents";
+
     /** Analyzer used in whole project */
     public static class Analyzer {
         private static volatile MyRomanianAnalyzer instance;
