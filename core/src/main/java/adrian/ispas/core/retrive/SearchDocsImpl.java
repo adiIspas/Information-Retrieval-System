@@ -2,9 +2,13 @@ package adrian.ispas.core.retrive;
 
 import adrian.ispas.helper.Constants;
 import org.apache.log4j.Logger;
+import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.search.highlight.*;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -87,5 +91,31 @@ public class SearchDocsImpl implements SearchDocsService {
         }
 
         return queryResults;
+    }
+
+    public void searchAndHighLightKeywords(String searchQuery) throws Exception {
+        QueryParser queryParser = new QueryParser(Constants.CONTENTS, Constants.Analyzer.getAnalyzer());
+        Query query = queryParser.parse(searchQuery);
+        QueryScorer queryScorer = new QueryScorer(query, Constants.CONTENTS);
+        Fragmenter fragmenter = new SimpleSpanFragmenter(queryScorer);
+
+        Highlighter highlighter = new Highlighter(queryScorer); // Set the best scorer fragments
+        highlighter.setTextFragmenter(fragmenter); // Set fragment to highlight
+
+        Searcher searcher = new Searcher(Constants.INDEX_DIR);
+
+        ScoreDoc scoreDocs[] = searcher.search(searchQuery).scoreDocs;
+        for (ScoreDoc scoreDoc : scoreDocs) {
+            Document document = searcher.getDocument(scoreDoc);
+            String content = document.get(Constants.CONTENTS);
+//            TokenStream tokenStream = TokenSources.getAnyTokenStream(searcher.getIndexSearcher().getIndexReader(), scoreDoc.doc, Constants.CONTENTS, document, Constants.Analyzer.getAnalyzer());
+            TokenStream tokenStream = TokenSources.getTokenStream(Constants.CONTENTS, null, content, Constants.Analyzer.getAnalyzer(), -1);
+            String[] fragments = highlighter.getBestFragments(tokenStream, content, 3);
+            for (String fragment:fragments) {
+                System.out.println(fragment);
+                System.out.println(".....");
+            }
+            System.out.println("||||||||");
+        }
     }
 }

@@ -15,4 +15,5 @@ public interface SearchDocsService {
      * @return Results, total time of execution and total results that match with query
      */
     HashMap<String, Object> search(String query);
+    void searchAndHighLightKeywords(String searchQuery) throws Exception;
 }

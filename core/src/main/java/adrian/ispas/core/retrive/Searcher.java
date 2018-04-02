@@ -59,4 +59,20 @@ public class Searcher {
     Document getDocument(ScoreDoc scoreDoc) throws IOException {
         return indexSearcher.doc(scoreDoc.doc);
     }
+
+    public IndexSearcher getIndexSearcher() {
+        return indexSearcher;
+    }
+
+    public void setIndexSearcher(IndexSearcher indexSearcher) {
+        this.indexSearcher = indexSearcher;
+    }
+
+    public QueryParser getQueryParser() {
+        return queryParser;
+    }
+
+    public void setQueryParser(QueryParser queryParser) {
+        this.queryParser = queryParser;
+    }
 }

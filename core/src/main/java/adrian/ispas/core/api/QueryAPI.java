@@ -42,6 +42,8 @@ public class QueryAPI {
         try {
             HashMap<String, Object> queryResults = searchDocsService.search(query);
 
+            searchDocsService.searchAndHighLightKeywords(query);
+
             resultResponse.put("results", queryResults.get("results"));
             resultResponse.put("timeOfExecution", queryResults.get("timeOfExecution"));
             resultResponse.put("totalResults", queryResults.get("totalResults"));
