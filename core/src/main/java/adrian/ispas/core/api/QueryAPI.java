@@ -1,7 +1,7 @@
 package adrian.ispas.core.api;
 
 import adrian.ispas.core.index.Indexer;
-import adrian.ispas.core.retrive.SearchDocsService;
+import adrian.ispas.core.retrieve.SearchDocsService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -40,9 +40,7 @@ public class QueryAPI {
 
         /** Search query in indexed documents and return specified data */
         try {
-            HashMap<String, Object> queryResults = searchDocsService.search(query);
-
-            searchDocsService.searchAndHighLightKeywords(query);
+            HashMap<String, Object> queryResults = searchDocsService.highlighterSearch(query);
 
             resultResponse.put("results", queryResults.get("results"));
             resultResponse.put("timeOfExecution", queryResults.get("timeOfExecution"));

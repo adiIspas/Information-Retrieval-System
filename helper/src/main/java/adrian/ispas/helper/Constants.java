@@ -44,6 +44,13 @@ public class Constants {
         }
     }
 
+    /** Constants for highlighter configuration */
+    public static class Highlighter {
+        public static final int MAX_START_OFFSET = -1;
+        public static final int MAX_NUM_FRAGMENTS = 3;
+        public static final String SEPARATOR = " ... ";
+    }
+
     /** Constants used for make a path with a specified format */
     public static final String PATH_DELIMITER = "/";
     public static final String PATH_STARTER = "documents";

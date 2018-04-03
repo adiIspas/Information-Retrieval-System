@@ -1,4 +1,4 @@
-package adrian.ispas.core.retrive;
+package adrian.ispas.core.retrieve;
 
 import java.util.HashMap;
 
@@ -15,5 +15,11 @@ public interface SearchDocsService {
      * @return Results, total time of execution and total results that match with query
      */
     HashMap<String, Object> search(String query);
-    void searchAndHighLightKeywords(String searchQuery) throws Exception;
+
+    /**
+     * Search indexed documents by received query and return best matched documents with highlight content
+     * @param query Query for search
+     * @return Results with highlight content, total time of execution and total results that match with query
+     */
+    HashMap<String, Object> highlighterSearch(String query);
 }
