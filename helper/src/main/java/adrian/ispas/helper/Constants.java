@@ -55,6 +55,9 @@ public class Constants {
     public static final String PATH_DELIMITER = "/";
     public static final String PATH_STARTER = "documents";
 
+    /** Context highlighter */
+    public static final int CONTEXT_WINDOW_LENGTH = 5;
+
     /** Analyzer used in whole project */
     public static class Analyzer {
         private static volatile MyRomanianAnalyzer instance;

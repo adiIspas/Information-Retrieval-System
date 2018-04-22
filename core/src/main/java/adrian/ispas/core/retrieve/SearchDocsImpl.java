@@ -125,7 +125,8 @@ public class SearchDocsImpl implements SearchDocsService {
 
                     oneResult.put("fileName", doc.get(Constants.FILE_NAME));
                     oneResult.put("relativePath", ProcessesResults.processesPath(doc.get(Constants.FILE_PATH), Constants.PATH_DELIMITER, Constants.PATH_STARTER));
-                    oneResult.put("contentExtracted", ProcessesResults.getHighlighterContent(doc, highlighter));
+//                    oneResult.put("contentExtracted", ProcessesResults.getHighlighterContent(doc, highlighter));
+                    oneResult.put("contentExtracted", ProcessesResults.getHighlighterContentV2(doc, query));
 
                     results.add(oneResult);
                 } catch (IOException e) {
@@ -174,7 +175,8 @@ public class SearchDocsImpl implements SearchDocsService {
         QueryScorer queryScorer = new QueryScorer(query, Constants.CONTENTS);
         Fragmenter fragmenter = new SimpleSpanFragmenter(queryScorer);
 
-        Highlighter highlighter = new Highlighter(queryScorer);
+        Formatter formatter = new SimpleHTMLFormatter("<b>", "</b>");
+        Highlighter highlighter = new Highlighter(formatter, queryScorer);
         highlighter.setTextFragmenter(fragmenter);
 
         return highlighter;

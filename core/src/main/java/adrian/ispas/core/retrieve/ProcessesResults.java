@@ -3,10 +3,19 @@ package adrian.ispas.core.retrieve;
 import adrian.ispas.helper.Constants;
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.search.Query;
 import org.apache.lucene.search.highlight.*;
 
 import java.io.IOException;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Processes Results is used to put the results of search in a specified format.
@@ -80,5 +89,61 @@ public class ProcessesResults {
         }
 
         return fragments;
+    }
+
+    public static String getHighlighterContentV2(Document document, String searchQuery) throws IOException {
+        Query query = initQuery(searchQuery);
+        List<String> clauses = extractClausesFrom(query);
+
+        if (clauses.size() > 0) {
+            String content = document.get(Constants.CONTENTS);
+            StringBuilder finalContent = new StringBuilder(content);
+
+            TokenStream tokenStream = Constants.Analyzer.getAnalyzer().tokenStream(null, new StringReader(content));
+            OffsetAttribute offsetAttribute = tokenStream.addAttribute(OffsetAttribute.class);
+            CharTermAttribute charTermAttribute = tokenStream.addAttribute(CharTermAttribute.class);
+
+            tokenStream.reset();
+            int totalInserted = 0;
+            while (tokenStream.incrementToken()) {
+                int startOffset = offsetAttribute.startOffset() + totalInserted;
+                int endOffset = offsetAttribute.endOffset() + totalInserted;
+                String term = charTermAttribute.toString();
+
+                if(clauses.contains(term)) {
+                    finalContent.insert(startOffset, "<b>");
+                    endOffset += 3;
+                    finalContent.insert(endOffset, "</b>");
+                    totalInserted += 7;
+                }
+            }
+
+            tokenStream.end();
+            tokenStream.close();
+
+            return finalContent.toString();
+        }
+
+        return "";
+    }
+
+    private static Query initQuery(String searchQuery) {
+        QueryParser queryParser = new QueryParser(Constants.CONTENTS, Constants.Analyzer.getAnalyzer());
+
+        try {
+            return  queryParser.parse(searchQuery);
+        } catch (ParseException e) {
+            LOG.error("Query couldn't be parsed because: " + e);
+        }
+
+        return null;
+    }
+
+    private static List<String> extractClausesFrom(Query query) {
+        if(query != null) {
+            return Arrays.asList(query.toString().replace(Constants.CONTENTS.toLowerCase() + ":", "").split(" "));
+        }
+
+        return new ArrayList<>();
     }
 }
