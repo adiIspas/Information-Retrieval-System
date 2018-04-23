@@ -1,6 +1,7 @@
 package adrian.ispas.core.retrieve;
 
 import adrian.ispas.helper.Constants;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
@@ -13,9 +14,7 @@ import org.apache.lucene.search.highlight.*;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * Processes Results is used to put the results of search in a specified format.
@@ -83,7 +82,8 @@ public class ProcessesResults {
 
         try {
             assert tokenStream != null;
-            fragments = highlighter.getBestFragments(tokenStream, content, Constants.Highlighter.MAX_NUM_FRAGMENTS,  Constants.Highlighter.SEPARATOR);
+//            fragments = highlighter.getBestFragments(tokenStream, content, Constants.Highlighter.MAX_NUM_FRAGMENTS,  Constants.Highlighter.SEPARATOR);
+            fragments = highlighter.getBestFragment(tokenStream, content);
         } catch (IOException | InvalidTokenOffsetsException e) {
             LOG.error("Best fragments couldn't be retrieved because: " + e);
         }
@@ -104,24 +104,48 @@ public class ProcessesResults {
             CharTermAttribute charTermAttribute = tokenStream.addAttribute(CharTermAttribute.class);
 
             tokenStream.reset();
-            int totalInserted = 0;
+            String finalResult = "";
+            int totalTerms = 0;
             while (tokenStream.incrementToken()) {
-                int startOffset = offsetAttribute.startOffset() + totalInserted;
-                int endOffset = offsetAttribute.endOffset() + totalInserted;
+                int startOffset = offsetAttribute.startOffset();
+                int endOffset = offsetAttribute.endOffset();
                 String term = charTermAttribute.toString();
 
                 if(clauses.contains(term)) {
-                    finalContent.insert(startOffset, "<b>");
-                    endOffset += 3;
-                    finalContent.insert(endOffset, "</b>");
-                    totalInserted += 7;
+                    List<String> beginWords = Arrays.asList(finalContent.substring(0, startOffset).trim().split(" "));
+                    List<String> endWords = Arrays.asList(finalContent.substring(endOffset).trim().split(" "));
+
+                    List<String> firstWords = beginWords.subList(Math.max(0, beginWords.size() - 5), beginWords.size());
+                    List<String> lastWords = endWords.subList(0, Math.min(5, endWords.size()));
+
+
+
+                    Set<String> terms = new HashSet<>();
+                    terms.add(term);
+                    Map<String, Object> resultBegin = analyseWords(firstWords, clauses, terms);
+                    terms = (Set<String>)resultBegin.get("score");
+                    Map<String, Object> resultEnd = analyseWords(lastWords, clauses, terms);
+                    terms = (Set<String>)resultEnd.get("score");
+
+                    if(terms.size() > totalTerms) {
+                        finalResult = "";
+                        finalResult += " ... " +  resultBegin.get("content") + " <b>" + content.substring(startOffset, endOffset)  + "</b> " + resultEnd.get("content") + " ... " + "<br>";
+                        totalTerms = terms.size();
+                    }
+
+//                    String begin = analyseWords(firstWords, clauses, terms);
+//                    String end = analyseWords(lastWords, clauses, terms);
+
+//                    String begin = StringUtils.join(firstWords, " ");
+//                    String end = StringUtils.join(lastWords, " ");
                 }
             }
 
             tokenStream.end();
             tokenStream.close();
 
-            return finalContent.toString();
+//            return finalContent.toString();
+            return finalResult;
         }
 
         return "";
@@ -145,5 +169,35 @@ public class ProcessesResults {
         }
 
         return new ArrayList<>();
+    }
+
+    private static Map<String, Object> analyseWords(List<String> words, List<String> clauses, Set<String> terms) throws IOException {
+        Map<String, Object> results = new HashMap<>();
+
+        String finalResult = "";
+
+        for(String word:words) {
+            TokenStream tokenStream = Constants.Analyzer.anotherAnalyzer().tokenStream(null, new StringReader(word));
+            CharTermAttribute charTermAttribute = tokenStream.addAttribute(CharTermAttribute.class);
+
+            tokenStream.reset();
+            tokenStream.incrementToken();
+            String term = charTermAttribute.toString();
+            if(clauses.contains(term) && !terms.contains(term)) {
+                finalResult += "<b>" + word + "</b> ";
+            }
+            else {
+                finalResult += word + " ";
+            }
+            terms.add(term);
+
+            tokenStream.end();
+            tokenStream.close();
+        }
+
+
+        results.put("score", terms);
+        results.put("content", finalResult);
+        return results;
     }
 }

@@ -80,5 +80,9 @@ public class Constants {
 
             return result;
         }
+
+        public static MyRomanianAnalyzer anotherAnalyzer() {
+            return new MyRomanianAnalyzer(Paths.get(Constants.STOP_WORDS));
+        }
     }
 }
