@@ -115,10 +115,8 @@ public class ProcessesResults {
                     List<String> beginWords = Arrays.asList(finalContent.substring(0, startOffset).trim().split(" "));
                     List<String> endWords = Arrays.asList(finalContent.substring(endOffset).trim().split(" "));
 
-                    List<String> firstWords = beginWords.subList(Math.max(0, beginWords.size() - 5), beginWords.size());
-                    List<String> lastWords = endWords.subList(0, Math.min(5, endWords.size()));
-
-
+                    List<String> firstWords = beginWords.subList(Math.max(0, beginWords.size() - Constants.CONTEXT_WINDOW_LENGTH), beginWords.size());
+                    List<String> lastWords = endWords.subList(0, Math.min(Constants.CONTEXT_WINDOW_LENGTH, endWords.size()));
 
                     Set<String> terms = new HashSet<>();
                     terms.add(term);
@@ -185,11 +183,12 @@ public class ProcessesResults {
             String term = charTermAttribute.toString();
             if(clauses.contains(term) && !terms.contains(term)) {
                 finalResult += "<b>" + word + "</b> ";
+                terms.add(term);
             }
             else {
                 finalResult += word + " ";
             }
-            terms.add(term);
+
 
             tokenStream.end();
             tokenStream.close();
