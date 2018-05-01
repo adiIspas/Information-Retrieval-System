@@ -1,5 +1,6 @@
 package adrian.ispas.core.retrieve;
 
+import adrian.ispas.core.process.ProcessesResults;
 import adrian.ispas.helper.Constants;
 import org.apache.log4j.Logger;
 import org.apache.lucene.document.Document;
