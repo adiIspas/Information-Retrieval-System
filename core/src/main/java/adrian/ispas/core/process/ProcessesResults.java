@@ -217,6 +217,11 @@ public class ProcessesResults {
         for(Context context: contexts) {
             String tempContext = "";
             Boolean existTerm = false;
+            List<String> firstWords = new ArrayList<>();
+            List<String> lastWords = new ArrayList<>();
+            boolean finishFirst = false;
+
+            String beforeWords;
             for (String word : context.getText().split(" ")) {
                 TokenStream tokenStream = Constants.Analyzer.RomanianAnalyzer().tokenStream(null, new StringReader(word));
                 CharTermAttribute charTermAttribute = tokenStream.addAttribute(CharTermAttribute.class);
@@ -225,11 +230,25 @@ public class ProcessesResults {
                 tokenStream.incrementToken();
                 String term = charTermAttribute.toString();
                 if (clauses.contains(term) && !checkedTerms.contains(term)) {
-                    tempContext += "<b>" + word + "</b> ";
                     checkedTerms.add(term);
                     existTerm = true;
+
+                    if(!finishFirst) {
+                        finishFirst = true;
+                        firstWords = firstWords.subList(Math.max(firstWords.size() - Constants.CONTEXT_WINDOW_LENGTH, 0), firstWords.size());
+                        beforeWords = String.join(" ", firstWords);
+                        tempContext = beforeWords + " <b>" + word + "</b> ";
+                    } else {
+                        tempContext += " <b>" + word + "</b> ";
+                        lastWords = new ArrayList<>();
+                    }
                 } else {
-                    tempContext += word + " ";
+                    if(!finishFirst) {
+                        firstWords.add(word);
+                    } else {
+                        tempContext += word + " ";
+                        lastWords.add(word);
+                    }
                 }
 
                 tokenStream.end();
