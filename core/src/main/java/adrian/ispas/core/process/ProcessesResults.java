@@ -113,7 +113,10 @@ public class ProcessesResults {
 
                 String term = charTermAttribute.toString();
                 if(clauses.contains(term)) {
-                    contexts.add(extractContextFrom(startOffset, endOffset, content));
+                    Context context = extractContextFrom(startOffset, endOffset, content, clauses);
+                    context.addTerm(term);
+
+                    contexts.add(context);
                 }
             }
 
@@ -131,7 +134,7 @@ public class ProcessesResults {
         return finalContentResult;
     }
 
-    private static Context extractContextFrom(int startOffset, int endOffset, String content) {
+    private static Context extractContextFrom(int startOffset, int endOffset, String content, List<String> clauses) throws IOException {
         StringBuilder documentContent = new StringBuilder(content);
 
         List<String> tempWordsBeforeTerm = Arrays.asList(documentContent.substring(0, startOffset).trim().split(" "));
@@ -140,13 +143,27 @@ public class ProcessesResults {
         List<String> wordsBeforeTerm = tempWordsBeforeTerm.subList(Math.max(0, tempWordsBeforeTerm.size() - Constants.CONTEXT_WINDOW_LENGTH), tempWordsBeforeTerm.size());
         List<String> wordsAfterTerm = tempWordsAfterTerm.subList(0, Math.min(Constants.CONTEXT_WINDOW_LENGTH, tempWordsAfterTerm.size()));
 
+        Context context = new Context();
+        List<String> newList = new ArrayList<>(wordsBeforeTerm);
+        newList.addAll(wordsAfterTerm);
+        for(String word:newList) {
+            TokenStream tokenStream = Constants.Analyzer.RomanianAnalyzer().tokenStream(null, new StringReader(word));
+            CharTermAttribute charTermAttribute = tokenStream.addAttribute(CharTermAttribute.class);
+            tokenStream.reset();
+            tokenStream.incrementToken();
+            String term = charTermAttribute.toString();
+            if(clauses.contains(term)) {
+                context.addTerm(term);
+            }
+        }
+
         String beforeContext = String.join(" ", wordsBeforeTerm);
         String afterContext = String.join(" ", wordsAfterTerm);
 
         int start = Math.max(0, startOffset - beforeContext.length() - 1);
         int end = Math.min(content.length(), endOffset + afterContext.length() + 1);
 
-        Context context = new Context();
+
         context.setText(beforeContext + " " + content.substring(startOffset, endOffset) + " " + afterContext);
         context.setStartOffset(start);
         context.setEndOffset(end);
@@ -159,7 +176,6 @@ public class ProcessesResults {
 
         int startOffset = 0;
         int endOffset = 0;
-        int index = 0;
         for (Context context:contexts) {
             if (context.getStartOffset() <= endOffset) {
                 startOffset = Math.min(startOffset, context.getStartOffset());
@@ -170,10 +186,11 @@ public class ProcessesResults {
                 contextTemp.setEndOffset(endOffset);
                 contextTemp.setText(content.substring(startOffset, endOffset));
                 contextTemp.setContentLength(content.length());
+                contextTemp.setTerms(context.getTerms());
 
-                if(newContexts.size() > index) {
-                    newContexts.remove(index);
-                    index++;
+                if(newContexts.size() > 0) {
+                    context.addAllTerms(newContexts.get(newContexts.size() - 1).getTerms());
+                    newContexts.remove(newContexts.size() - 1);
                 }
 
                 newContexts.add(contextTemp);
@@ -210,7 +227,69 @@ public class ProcessesResults {
         return new ArrayList<>();
     }
 
+    private static List<Context> sortContextsByTermsAndPosition(List<Context> contexts) {
+        contexts.sort((context1, context2) -> {
+            Integer x1 = context1.getTerms().size();
+            Integer x2 = context2.getTerms().size();
+            int sComp = x1.compareTo(x2);
+
+            if (sComp != 0) {
+                return sComp;
+            }
+
+            x1 = context1.getStartOffset();
+            x2 = context2.getStartOffset();
+            return x1.compareTo(x2);
+        });
+
+        return contexts;
+    }
+
+    private static List<Context> sortContextsByPosition(List<Context> contexts) {
+        contexts.sort((context1, context2) -> {
+            Integer x1 = context1.getStartOffset();
+            Integer x2 = context2.getStartOffset();
+            return x1.compareTo(x2);
+        });
+
+        return contexts;
+    }
+
+    private static List<Context> preProcessBestContexts(List<Context> contexts) {
+        List<Context> finalContexts = new ArrayList<>();
+        contexts = sortContextsByTermsAndPosition(contexts);
+
+        List<Context> tempContexts = new ArrayList<>(contexts);
+        Set<Context> deletedContexts = new HashSet<>();
+        for(int index = 0; index < tempContexts.size(); index++) {
+            Context tempContext = tempContexts.get(index);
+            Set<String> tempContextTerms = new HashSet<>(tempContext.getTerms());
+            Set<String> copyTempContextTerms = new HashSet<>(tempContext.getTerms());
+
+            for(int secondIndex = 0; secondIndex < tempContexts.size(); secondIndex++) {
+                if(secondIndex != index && !deletedContexts.contains(tempContexts.get(secondIndex))) {
+                    Context secondTempContext = tempContexts.get(secondIndex);
+                    for (String term : tempContextTerms) {
+                        if (secondTempContext.getTerms().contains(term)) {
+                            copyTempContextTerms.remove(term);
+                        }
+                    }
+                }
+            }
+
+            if(copyTempContextTerms.size() > 0) {
+                finalContexts.add(tempContext);
+            } else {
+                deletedContexts.add(tempContext);
+            }
+        }
+
+        return sortContextsByPosition(finalContexts);
+    }
+
     private static String processesBestContexts(List<Context> contexts, List<String> clauses) throws IOException {
+        contexts = preProcessBestContexts(contexts);
+
         String finalResult = "";
         Set<String> checkedTerms = new HashSet<>();
 
@@ -218,7 +297,6 @@ public class ProcessesResults {
             String tempContext = "";
             Boolean existTerm = false;
             List<String> firstWords = new ArrayList<>();
-            List<String> lastWords = new ArrayList<>();
             boolean finishFirst = false;
 
             String beforeWords;
@@ -232,6 +310,7 @@ public class ProcessesResults {
                 if (clauses.contains(term) && !checkedTerms.contains(term)) {
                     checkedTerms.add(term);
                     existTerm = true;
+                    context.removeTerms(term);
 
                     if(!finishFirst) {
                         finishFirst = true;
@@ -240,14 +319,12 @@ public class ProcessesResults {
                         tempContext = beforeWords + " <b>" + word + "</b> ";
                     } else {
                         tempContext += " <b>" + word + "</b> ";
-                        lastWords = new ArrayList<>();
                     }
                 } else {
                     if(!finishFirst) {
                         firstWords.add(word);
                     } else {
                         tempContext += word + " ";
-                        lastWords.add(word);
                     }
                 }
 
