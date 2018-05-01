@@ -171,7 +171,7 @@ public class ProcessesResults {
         return context;
     }
 
-    public static List<Context> merge(List<Context> contexts, String content) {
+    private static List<Context> merge(List<Context> contexts, String content) {
         List<Context> newContexts = new ArrayList<>();
 
         int startOffset = 0;
@@ -231,10 +231,10 @@ public class ProcessesResults {
         contexts.sort((context1, context2) -> {
             Integer x1 = context1.getTerms().size();
             Integer x2 = context2.getTerms().size();
-            int sComp = x1.compareTo(x2);
+            int result = x1.compareTo(x2);
 
-            if (sComp != 0) {
-                return sComp;
+            if (result != 0) {
+                return result;
             }
 
             x1 = context1.getStartOffset();
