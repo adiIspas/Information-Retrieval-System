@@ -1,5 +1,6 @@
 package adrian.ispas.core.process;
 
+import adrian.ispas.core.context.CloseToken;
 import adrian.ispas.core.context.Context;
 import adrian.ispas.helper.Constants;
 import org.apache.log4j.Logger;
@@ -292,14 +293,18 @@ public class ProcessesResults {
 
         String finalResult = "";
         Set<String> checkedTerms = new HashSet<>();
+        boolean first = true;
 
         for(Context context: contexts) {
+            Map<String, Integer> results = getHighlightCloseTokens(context, clauses);
+
             String tempContext = "";
             Boolean existTerm = false;
             List<String> firstWords = new ArrayList<>();
             boolean finishFirst = false;
 
             String beforeWords;
+            int position = 0;
             for (String word : context.getText().split(" ")) {
                 TokenStream tokenStream = Constants.Analyzer.RomanianAnalyzer().tokenStream(null, new StringReader(word));
                 CharTermAttribute charTermAttribute = tokenStream.addAttribute(CharTermAttribute.class);
@@ -307,7 +312,7 @@ public class ProcessesResults {
                 tokenStream.reset();
                 tokenStream.incrementToken();
                 String term = charTermAttribute.toString();
-                if (clauses.contains(term) && !checkedTerms.contains(term)) {
+                if (clauses.contains(term) && !checkedTerms.contains(term) && results.get(term).equals(position)) {
                     checkedTerms.add(term);
                     existTerm = true;
                     context.removeTerms(term);
@@ -330,17 +335,68 @@ public class ProcessesResults {
 
                 tokenStream.end();
                 tokenStream.close();
+                position++;
             }
 
             if (existTerm) {
+
+                if(first && context.getStartOffset() > 0) {
+                    finalResult += " ... ";
+                    first = false;
+                }
+
                 finalResult += tempContext;
 
                 if(context.getContentLength() > context.getEndOffset()) {
                     finalResult += " ... ";
+                    first = false;
                 }
             }
         }
 
         return finalResult;
+    }
+
+    private static Map<String, Integer> getHighlightCloseTokens(Context context, List<String> clauses) throws IOException {
+
+        int position = 0;
+        List<CloseToken> closeTokens = new ArrayList<>();
+        Map<String, Integer> results = new HashMap<>();
+        Map<String, Integer> positions = new HashMap<>();
+
+        for (String word : context.getText().split(" ")) {
+            TokenStream tokenStream = Constants.Analyzer.RomanianAnalyzer().tokenStream(null, new StringReader(word));
+            OffsetAttribute offsetAttribute = tokenStream.addAttribute(OffsetAttribute.class);
+            CharTermAttribute charTermAttribute = tokenStream.addAttribute(CharTermAttribute.class);
+
+            tokenStream.reset();
+            tokenStream.incrementToken();
+            String term = charTermAttribute.toString();
+            int startOffset = offsetAttribute.startOffset();
+            int endOffset = offsetAttribute.endOffset();
+
+            if(clauses.contains(term)) {
+                closeTokens.add(new CloseToken(term, position, startOffset, endOffset));
+            }
+
+            position++;
+        }
+
+        for(CloseToken closeToken:closeTokens) {
+            int distance = 0;
+            for(CloseToken closeTokenSecond:closeTokens) {
+                distance += Math.abs(closeTokenSecond.getPosition() - closeToken.getPosition());
+            }
+
+            results.putIfAbsent(closeToken.getToken(), distance);
+            positions.putIfAbsent(closeToken.getToken(), closeToken.getPosition());
+
+            if(results.get(closeToken.getToken()) > distance) {
+                results.put(closeToken.getToken(), distance);
+                positions.put(closeToken.getToken(), closeToken.getPosition());
+            }
+        }
+
+        return positions;
     }
 }
