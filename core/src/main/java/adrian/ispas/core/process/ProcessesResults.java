@@ -232,7 +232,7 @@ public class ProcessesResults {
         contexts.sort((context1, context2) -> {
             Integer x1 = context1.getTerms().size();
             Integer x2 = context2.getTerms().size();
-            int result = x1.compareTo(x2);
+            int result = x2.compareTo(x1);
 
             if (result != 0) {
                 return result;
@@ -258,7 +258,6 @@ public class ProcessesResults {
 
     private static List<Context> preProcessBestContexts(List<Context> contexts) {
         List<Context> finalContexts = new ArrayList<>();
-        contexts = sortContextsByTermsAndPosition(contexts);
 
         List<Context> tempContexts = new ArrayList<>(contexts);
         Set<Context> deletedContexts = new HashSet<>();
@@ -285,7 +284,7 @@ public class ProcessesResults {
             }
         }
 
-        return sortContextsByPosition(finalContexts);
+        return sortContextsByTermsAndPosition(finalContexts);
     }
 
     private static String processesBestContexts(List<Context> contexts, List<String> clauses) throws IOException {
@@ -294,6 +293,8 @@ public class ProcessesResults {
         String finalResult = "";
         Set<String> checkedTerms = new HashSet<>();
         boolean first = true;
+
+        List<Context> finalContexts = new ArrayList<>();
 
         for(Context context: contexts) {
             Map<String, Integer> results = getHighlightCloseTokens(context, clauses);
@@ -339,18 +340,24 @@ public class ProcessesResults {
             }
 
             if (existTerm) {
+                context.setText(tempContext);
+            }
+            finalContexts.add(context);
+        }
 
-                if(first && context.getStartOffset() > 0) {
-                    finalResult += " ... ";
-                    first = false;
-                }
+        finalContexts = sortContextsByPosition(finalContexts);
 
-                finalResult += tempContext;
+        for (Context context:finalContexts) {
+            if (first && context.getStartOffset() > 0) {
+                finalResult += " ... ";
+                first = false;
+            }
 
-                if(context.getContentLength() > context.getEndOffset()) {
-                    finalResult += " ... ";
-                    first = false;
-                }
+            finalResult += context.getText();
+
+            if (context.getContentLength() > context.getEndOffset()) {
+                finalResult += " ... ";
+                first = false;
             }
         }
 
