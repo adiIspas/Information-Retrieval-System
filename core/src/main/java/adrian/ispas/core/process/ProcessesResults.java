@@ -306,6 +306,7 @@ public class ProcessesResults {
 
             String beforeWords;
             int position = 0;
+            int newStartOffset = 0;
             for (String word : context.getText().split(" ")) {
                 TokenStream tokenStream = Constants.Analyzer.RomanianAnalyzer().tokenStream(null, new StringReader(word));
                 CharTermAttribute charTermAttribute = tokenStream.addAttribute(CharTermAttribute.class);
@@ -320,6 +321,7 @@ public class ProcessesResults {
 
                     if(!finishFirst) {
                         finishFirst = true;
+                        newStartOffset = String.join(" ", firstWords.subList(0,Math.max(firstWords.size() - Constants.CONTEXT_WINDOW_LENGTH, 0))).length();
                         firstWords = firstWords.subList(Math.max(firstWords.size() - Constants.CONTEXT_WINDOW_LENGTH, 0), firstWords.size());
                         beforeWords = String.join(" ", firstWords);
                         tempContext = beforeWords + " <b>" + word + "</b> ";
@@ -341,6 +343,9 @@ public class ProcessesResults {
 
             if (existTerm) {
                 context.setText(tempContext);
+                if(newStartOffset > 0) {
+                    context.setStartOffset(newStartOffset);
+                }
             }
             finalContexts.add(context);
         }
