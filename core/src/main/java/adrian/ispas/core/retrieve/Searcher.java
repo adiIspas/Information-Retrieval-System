@@ -1,4 +1,4 @@
-package adrian.ispas.core.retrive;
+package adrian.ispas.core.retrieve;
 
 import adrian.ispas.helper.Constants;
 import org.apache.lucene.document.Document;
