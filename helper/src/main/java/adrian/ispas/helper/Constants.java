@@ -27,7 +27,7 @@ public class Constants {
     public static final int MAX_SEARCH = 10;
 
     /** Constants about store place for raw and indexed documents */
-    public static final String DATA_DIR = "helper/src/main/resources/documents";
+    public static final String DATA_DIR = "helper/src/main/resources/documents/features/diacritics";
     public static final String INDEX_DIR = "helper/src/main/resources/documents_indexes";
 
     /** Types of file supported for index */
@@ -43,6 +43,20 @@ public class Constants {
             filters.add(new RtfFileFilter());
         }
     }
+
+    /** Constants for highlighter configuration */
+    public static class Highlighter {
+        public static final int MAX_START_OFFSET = -1;
+        public static final int MAX_NUM_FRAGMENTS = 3;
+        public static final String SEPARATOR = " ... ";
+    }
+
+    /** Constants used for make a path with a specified format */
+    public static final String PATH_DELIMITER = "/";
+    public static final String PATH_STARTER = "documents";
+
+    /** Context highlighter */
+    public static final int CONTEXT_WINDOW_LENGTH = 5;
 
     /** Analyzer used in whole project */
     public static class Analyzer {
@@ -65,6 +79,10 @@ public class Constants {
             }
 
             return result;
+        }
+
+        public static MyRomanianAnalyzer RomanianAnalyzer() {
+            return new MyRomanianAnalyzer(Paths.get(Constants.STOP_WORDS));
         }
     }
 }
