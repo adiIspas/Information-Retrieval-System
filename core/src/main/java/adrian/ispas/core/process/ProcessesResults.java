@@ -100,7 +100,7 @@ public class ProcessesResults {
 
         String content = "";
         if (clauses.size() > 0) {
-            content = document.get(Constants.CONTENTS);
+            content = document.get(Constants.DocumentParts.ABSTRACT) + " " + document.get(Constants.DocumentParts.CONTENT);
             content = content.replace("\n", "");
 
             TokenStream documentContentStream = Constants.Analyzer.getAnalyzer().tokenStream(null, new StringReader(content));

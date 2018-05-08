@@ -120,14 +120,14 @@ public class SearchDocsImpl implements SearchDocsService {
         if (passed) {
             for (ScoreDoc scoreDoc : hits.scoreDocs) {
                 Document doc;
-                HashMap<String, String> oneResult = new HashMap<>();
+                HashMap<String, Object> oneResult = new HashMap<>();
                 try {
                     doc = searcher.getDocument(scoreDoc);
 
                     oneResult.put("fileName", doc.get(Constants.FILE_NAME));
                     oneResult.put("relativePath", ProcessesResults.processesPath(doc.get(Constants.FILE_PATH), Constants.PATH_DELIMITER, Constants.PATH_STARTER));
-//                    oneResult.put("contentExtracted", ProcessesResults.getHighlighterContent(doc, highlighter));
                     oneResult.put("contentExtracted", ProcessesResults.getHighlighterContentV2(doc, query));
+                    oneResult.put("score", scoreDoc.score);
 
                     results.add(oneResult);
                 } catch (IOException e) {
