@@ -63,8 +63,8 @@ public class Constants {
         public static final String CONTENT = "content";
     }
 
+    /** Abstract variables */
     public static final float ABSTRACT_MULTIPLICATION_SCORE = 3.0f;
-
     public static final int ABSTRACT_WORDS_DIMENSION = 10;
 
     /** Analyzer used in whole project */

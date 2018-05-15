@@ -91,6 +91,13 @@ public class ProcessesResults {
         return fragments;
     }
 
+    /**
+     * Highlight every token found in a document content in the best content for token
+     * @param document Document founded
+     * @param searchQuery Search query of user
+     * @return Highlight content of document
+     * @throws IOException TokenStream can fail
+     */
     public static String getHighlighterContentV2(Document document, String searchQuery) throws IOException {
         Query query = initQuery(searchQuery);
         List<String> clauses = extractClausesFrom(query);
@@ -135,6 +142,15 @@ public class ProcessesResults {
         return finalContentResult;
     }
 
+    /**
+     * Extract context for a token
+     * @param startOffset Start position of token in content
+     * @param endOffset End position of token in content
+     * @param content Content of document
+     * @param clauses Clauses from query
+     * @return Context for a token
+     * @throws IOException TokenStream can fail
+     */
     private static Context extractContextFrom(int startOffset, int endOffset, String content, List<String> clauses) throws IOException {
         StringBuilder documentContent = new StringBuilder(content);
 
@@ -172,6 +188,12 @@ public class ProcessesResults {
         return context;
     }
 
+    /**
+     * Merge a list of contexts
+     * @param contexts List of contexts
+     * @param content Content of document
+     * @return Unique contexts
+     */
     private static List<Context> merge(List<Context> contexts, String content) {
         List<Context> newContexts = new ArrayList<>();
 
@@ -208,6 +230,11 @@ public class ProcessesResults {
         return newContexts;
     }
 
+    /**
+     * Init query parser
+     * @param searchQuery Search query from user
+     * @return Initiated query
+     */
     private static Query initQuery(String searchQuery) {
         QueryParser queryParser = new QueryParser(Constants.CONTENTS, Constants.Analyzer.getAnalyzer());
 
@@ -220,6 +247,11 @@ public class ProcessesResults {
         return null;
     }
 
+    /**
+     * Split query in clauses
+     * @param query Query initiated
+     * @return List of clauses
+     */
     private static List<String> extractClausesFrom(Query query) {
         if(query != null) {
             return Arrays.asList(query.toString().replace(Constants.CONTENTS.toLowerCase() + ":", "").split(" "));
@@ -228,6 +260,11 @@ public class ProcessesResults {
         return new ArrayList<>();
     }
 
+    /**
+     * Sort context by terms and position
+     * @param contexts List of contexts
+     * @return Lis of sorted contexts
+     */
     private static List<Context> sortContextsByTermsAndPosition(List<Context> contexts) {
         contexts.sort((context1, context2) -> {
             Integer x1 = context1.getTerms().size();
@@ -246,6 +283,11 @@ public class ProcessesResults {
         return contexts;
     }
 
+    /**
+     * Sort context by position
+     * @param contexts List of contexts
+     * @return Lis of sorted contexts
+     */
     private static List<Context> sortContextsByPosition(List<Context> contexts) {
         contexts.sort((context1, context2) -> {
             Integer x1 = context1.getStartOffset();
@@ -256,6 +298,11 @@ public class ProcessesResults {
         return contexts;
     }
 
+    /**
+     * Keep just contexts that contains most of tokens
+     * @param contexts List of contexts
+     * @return Contexts with the most of tokens
+     */
     private static List<Context> preProcessBestContexts(List<Context> contexts) {
         List<Context> finalContexts = new ArrayList<>();
 
@@ -287,6 +334,13 @@ public class ProcessesResults {
         return sortContextsByTermsAndPosition(finalContexts);
     }
 
+    /**
+     * Process best context and highlight
+     * @param contexts A list of contexts
+     * @param clauses A list of clauses
+     * @return Highlight content of document
+     * @throws IOException TokenStream can fail
+     */
     private static String processesBestContexts(List<Context> contexts, List<String> clauses) throws IOException {
         contexts = preProcessBestContexts(contexts);
 
@@ -369,6 +423,13 @@ public class ProcessesResults {
         return finalResult;
     }
 
+    /**
+     * Highlight close tokens from a context
+     * @param context Context from content
+     * @param clauses A list of clauses
+     * @return A map of tokens with positions
+     * @throws IOException TokenStream can fail
+     */
     private static Map<String, Integer> getHighlightCloseTokens(Context context, List<String> clauses) throws IOException {
 
         int position = 0;

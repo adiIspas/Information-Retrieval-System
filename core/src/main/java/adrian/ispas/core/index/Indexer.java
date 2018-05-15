@@ -163,6 +163,11 @@ public class Indexer {
         return fileContent;
     }
 
+    /**
+     * Split content from a document in two parts, abstract and main content
+     * @param content Content of document
+     * @return Splitted content
+     */
     private Map<String, String> splitDocumentContent(String content) {
         Map<String, String> splittedContent = new HashMap<>();
         List<String> documentWords = Arrays.asList(content.split(" "));
