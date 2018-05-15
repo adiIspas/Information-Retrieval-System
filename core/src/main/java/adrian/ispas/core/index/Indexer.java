@@ -17,7 +17,10 @@ import java.io.*;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Indexed is used to extract documents from a specific path and index in system
@@ -49,10 +52,12 @@ public class Indexer {
     private Document extractDocumentFrom(File file) throws IOException {
         Document document = new Document();
         String currentPath = FileSystems.getDefault().getPath("").toAbsolutePath().toString();
+        Map<String, String> splittedContent = splitDocumentContent(extractContent(file));
 
         document.add(new StringField(Constants.FILE_NAME, file.getName(), Field.Store.YES));
         document.add(new StringField(Constants.FILE_PATH, file.getAbsolutePath().replace(currentPath, ""), Field.Store.YES));
-        document.add(new TextField(Constants.CONTENTS, extractContent(file), Field.Store.YES));
+        document.add(new TextField(Constants.DocumentParts.ABSTRACT, splittedContent.get(Constants.DocumentParts.ABSTRACT), Field.Store.YES));
+        document.add(new TextField(Constants.DocumentParts.CONTENT, splittedContent.get(Constants.DocumentParts.CONTENT), Field.Store.YES));
 
         return document;
     }
@@ -156,5 +161,27 @@ public class Indexer {
         }
 
         return fileContent;
+    }
+
+    /**
+     * Split content from a document in two parts, abstract and main content
+     * @param content Content of document
+     * @return Splitted content
+     */
+    private Map<String, String> splitDocumentContent(String content) {
+        Map<String, String> splittedContent = new HashMap<>();
+        List<String> documentWords = Arrays.asList(content.split(" "));
+
+        String abstractContent = String.join(" ", documentWords.subList(0, Math.min(Constants.ABSTRACT_WORDS_DIMENSION, documentWords.size())));
+        splittedContent.put(Constants.DocumentParts.ABSTRACT, abstractContent);
+
+        if(Constants.ABSTRACT_WORDS_DIMENSION + 1 <= documentWords.size()) {
+            String mainContent = String.join(" ", documentWords.subList(Constants.ABSTRACT_WORDS_DIMENSION + 1, documentWords.size()));
+            splittedContent.put(Constants.DocumentParts.CONTENT, mainContent);
+        } else {
+            splittedContent.put(Constants.DocumentParts.CONTENT, abstractContent);
+        }
+
+        return splittedContent;
     }
 }
