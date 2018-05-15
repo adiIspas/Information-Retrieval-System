@@ -27,7 +27,7 @@ public class Constants {
     public static final int MAX_SEARCH = 10;
 
     /** Constants about store place for raw and indexed documents */
-    public static final String DATA_DIR = "helper/src/main/resources/documents/features/abstract";
+    public static final String DATA_DIR = "helper/src/main/resources/documents";
     public static final String INDEX_DIR = "helper/src/main/resources/documents_indexes";
 
     /** Types of file supported for index */
