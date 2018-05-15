@@ -49,6 +49,7 @@ public class QueryAPI {
             return new ResponseEntity<>(resultResponse, HttpStatus.OK);
         } catch (Exception e) {
             LOG.error("Error: Your query can't be executed because: " + e);
+            e.printStackTrace();
         }
 
         resultResponse.put("results", new ArrayList());

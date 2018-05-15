@@ -1,8 +1,10 @@
 package adrian.ispas.core.retrieve;
 
+import adrian.ispas.core.similarity.DocumentAbstractSimilarity;
 import adrian.ispas.helper.Constants;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
@@ -35,7 +37,12 @@ public class Searcher {
         DirectoryReader directoryReader = DirectoryReader.open(indexDirectory);
 
         indexSearcher = new IndexSearcher(directoryReader);
-        queryParser = new QueryParser(Constants.CONTENTS, Constants.Analyzer.getAnalyzer());
+        indexSearcher.setSimilarity(new DocumentAbstractSimilarity());
+
+//        queryParser = new QueryParser(Constants.DocumentParts.CONTENT, Constants.Analyzer.getAnalyzer());
+        queryParser = new MultiFieldQueryParser(
+                new String[] { Constants.DocumentParts.ABSTRACT, Constants.DocumentParts.CONTENT },
+                Constants.Analyzer.getAnalyzer());
     }
 
     /**

@@ -12,6 +12,8 @@ A basic Information retrieval system for Romanian language.
 
 If you want to use this app with web interface you can check this [link](https://github.com/adiIspas/Information-Retrieval-System-Web).
 
+![Screen capture at version 1.2.0](screencapture-v1.2.0.png)
+
 ## Instruction to use
 ### Requirements
  - Maven 3+
